@@ -1,7 +1,7 @@
 # Day 1 - Sonar Sweep with AWK
 You can find the description of the problem [here][1].
 
-## Description
+## About the solution
 [AWK][2] is a programming language specifically intended for text processing and
 data extraction. AWK programs are structured in terms of condition-action pairs,
 where each line of the input that satisfies the condition triggers the
