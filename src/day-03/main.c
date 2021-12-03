@@ -3,7 +3,7 @@
 #include <string.h>
 #include "line.h"
 
-uint32_t evil_global = 0;
+uint32_t evil_global;
 
 int cmpui32asc(const void* a, const void* b) {
     return (*(uint32_t*) a & evil_global) - (*(uint32_t*) b & evil_global);
@@ -59,51 +59,29 @@ void part2(void) {
 
     uint32_t* start;
     uint32_t* end;
-    uint32_t  r_oxygen;
-    uint32_t  r_scrubber;
-
-    // oxygen generator rating
-    start = bs;
-    end   = bs + n;
-    for (size_t i = 0; i < length; i++) {
-        evil_global = 1 << length - 1 - i;
-        qsort(start, end - start, sizeof(uint32_t), cmpui32asc);
-        size_t   half = (end - start) / 2;
-        if (start[half] & evil_global) {
-            while (!(*start & evil_global))
-                start++;
-        } else {
-            while (*(end - 1) & evil_global)
-                end--;
-        }
-        if (end - start == 1) {
-            r_oxygen = *start;
-            break;
-        }
-    }
-
-    // CO2 scrubber rating
-    start = bs;
-    end   = bs + n;
-    for (size_t i = 0; i < length; i++) {
-        evil_global = 1 << length - 1 - i;
-        qsort(start, end - start, sizeof(uint32_t), cmpui32asc);
-        size_t half = (end - start) / 2;
-        if (start[half] & evil_global) {
-            while (*(end - 1) & evil_global)
-                end--;
-        } else {
-            while (!(*start & evil_global))
-                start++;
-        }
-        if (end - start == 1) {
-            r_scrubber = *start;
-            break;
+    uint32_t  r[2];
+    for (uint32_t b = 0; b < 2; b++) {
+        start = bs;
+        end   = bs + n;
+        for (size_t i = 0; i < length; i++) {
+            evil_global = 1 << length - 1 - i;
+            qsort(start, end - start, sizeof(uint32_t), cmpui32asc);
+            if (b ^ (start[(end - start) / 2] & evil_global) > 0) {
+                while (!(*start & evil_global))
+                    start++;
+            } else {
+                while (*(end - 1) & evil_global)
+                    end--;
+            }
+            if (end - start == 1) {
+                r[b] = *start;
+                break;
+            }
         }
     }
 
     free(bs);
-    printf("%u\n", r_oxygen * r_scrubber);
+    printf("%u\n", r[0] * r[1]);
 }
 
 int main(int argc, char** argv) {
