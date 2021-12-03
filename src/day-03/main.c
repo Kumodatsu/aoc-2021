@@ -1,7 +1,7 @@
 #include <stdlib.h>
 #include <stdint.h>
 #include <string.h>
-#include "Line.h"
+#include "line.h"
 
 uint32_t evil_global = 0;
 
