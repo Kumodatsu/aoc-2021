@@ -3,6 +3,8 @@
 #include <string.h>
 #include "line.h"
 
+#define MAGIC_NUMBER 64
+
 uint32_t evil_global;
 
 int cmpui32asc(const void* a, const void* b) {
@@ -10,77 +12,39 @@ int cmpui32asc(const void* a, const void* b) {
 }
 
 void part1(void) {
-    size_t   length = 0;
-    uint32_t gamma  = 0;
-    {
-        uint32_t* ones = NULL;
-        uint32_t  n    = 0;
-        {
-            char* line = NULL;
-            while (read_line(stdin, &line, &length)) {
-                uint32_t b = strtoul(line, NULL, 2);
-                if (!ones)
-                    ones = calloc(length, sizeof(int32_t));
-                for (size_t i = 0; i < length; i++)
-                    ones[i] += (b & 1 << i) > 0;
-                n++;
-            }
-            free(line);
-        }
-        for (size_t i = 0; i < length; i++)
-            if (ones[i] > n / 2)
-                gamma |= 1 << i;
-        free(ones);
+    size_t l;
+    uint32_t g = 0, *o = 0, n = 0;
+    char* ln = 0;
+    while (read_line(stdin, &ln, &l)) {
+        n++;
+        o = o ? o : calloc(l, sizeof(int32_t));
+        for (size_t i = 0; i < l; i++)
+            o[i] += (strtoul(ln, 0, 2) & 1 << i) > 0;
     }
-    uint32_t epsilon     = ~gamma & (1 << length) - 1;
-    uint32_t consumption = gamma * epsilon;
-    printf("%u\n", consumption);
+    for (size_t i = 0; i < l; i++)
+        g |= (o[i] > n / 2) * 1 << i;
+    free(ln);
+    free(o);
+    printf("%u\n", g * (~g & (1 << l) - 1));
 }
 
 void part2(void) {
-    size_t    bs_cap = 64;
-    uint32_t* bs     = malloc(bs_cap * sizeof(uint32_t));
-    size_t    length = 0;
-    uint32_t  n      = 0;
-
-    {
-        char* line = NULL;
-        while (read_line(stdin, &line, &length)) {
-            uint32_t b = strtoul(line, NULL, 2);
-            n++;
-            if (n > bs_cap) {
-                bs_cap *= 2;
-                bs = realloc(bs, bs_cap * sizeof(uint32_t));
-            }
-            bs[n - 1] = b;
-        }
-        free(line);
-    }
-
-    uint32_t* start;
-    uint32_t* end;
-    uint32_t  r[2];
+    size_t c = MAGIC_NUMBER, l = 0;
+    uint32_t *a = malloc(c * sizeof(uint32_t)), n = 0;
+    char* ln = 0;
+    while (read_line(stdin, &ln, &l)) (a = ++n > c ? realloc(a, (c *= 2) * sizeof(uint32_t)) : a)[n - 1] = strtoul(ln, NULL, 2);
+    uint32_t *s, *e, r[2];
     for (uint32_t b = 0; b < 2; b++) {
-        start = bs;
-        end   = bs + n;
-        for (size_t i = 0; i < length; i++) {
-            evil_global = 1 << length - 1 - i;
-            qsort(start, end - start, sizeof(uint32_t), cmpui32asc);
-            if (b ^ (start[(end - start) / 2] & evil_global) > 0) {
-                while (!(*start & evil_global))
-                    start++;
-            } else {
-                while (*(end - 1) & evil_global)
-                    end--;
-            }
-            if (end - start == 1) {
-                r[b] = *start;
-                break;
-            }
+        e = (s = a) + n;
+        for (size_t i = 0; i < l; i++) {
+            evil_global = 1 << l - 1 - i;
+            qsort(s, e - s, sizeof(uint32_t), cmpui32asc);
+            if (b ^ (s[(e - s) / 2] & evil_global) > 0) while (!(*s & evil_global)) s++; else while (*(e - 1) & evil_global) e--;
+            if (e - s == 1) { r[b] = *s; break; }
         }
     }
-
-    free(bs);
+    free(ln);
+    free(a);
     printf("%u\n", r[0] * r[1]);
 }
 
