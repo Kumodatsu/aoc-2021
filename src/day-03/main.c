@@ -3,7 +3,7 @@
 #include <string.h>
 #include <stdio.h>
 
-#define MAGIC_NUMBER        64
+#define MAGIC_NUMBER        42
 #define UNHELPFUL_ERROR_MSG "invalid arguments"
 
 uint32_t evil_global;
