@@ -1,19 +1,4 @@
-using System.Collections.Generic;
-using System.Linq;
-
-static class Extensions {
-    public static IEnumerable<T> TakeUntil<T>(
-        this IEnumerable<T> xs, Predicate<T> p
-    ) => xs.TakeWhile(x => !p(x));
-
-    public static T Then<T>(this T obj, Action action) {
-        action();
-        return obj;
-    }
-
-    public static T Then<T>(this T obj, object x) => obj;
-    public static R Return<R>(this object obj, R x) => x;
-}
+global using static Global;
 
 static class Global {
     public static IEnumerable<string> GetInputLines() {
@@ -21,20 +6,25 @@ static class Global {
         while ((line = Console.ReadLine()) is not null)
             yield return line!;
     }
+}
 
-    public static readonly Sequencer Seq = Sequencer.Firstly();
+static class Extensions {
+    public static T Then<T>(this T obj, Action action) {
+        action();
+        return obj;
+    }
+
+    public static T Then<T>(this T obj, object x) => obj;
 }
 
 class Sequencer {
-    private Sequencer() {}
-    public static Sequencer Firstly() => new();
+    public Sequencer() {}
 
-    public Sequencer Firstly(Action action) => this.Then(action);
+    public Sequencer Firstly(Action<Sequencer> action)
+        => this.Then(() => action(this));
 
-    public Sequencer Let<T>(Func<T> x, Action<T> f) {
-        f(x());
-        return this;
-    }
+    public Sequencer Let<T>(Func<T> x, Action<T> f)
+        => this.Then(() => f(x()));
 
     public Sequencer Let<T>(T x, Action<T> f)
         => Let(() => x, f);
