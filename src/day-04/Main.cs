@@ -1,87 +1,63 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Text;
+using static Global;
 
 const StringSplitOptions SplitOptions
     = StringSplitOptions.RemoveEmptyEntries
     | StringSplitOptions.TrimEntries;
 
-int part = 0;
-if (!(args.Length == 1 && int.TryParse(args[0], out part) && part is 1 or 2)) {
-    Console.WriteLine(
-        "You must specify a single argument which is either 1 or 2 for Part 1 "
-        + "and Part 2 respectively."
-    );
-    return;
-}
-
-var charts  = new List<Chart>();
-var lines   = GetInputLines();
-var numbers = new Queue<int>(lines.First().Split(',').Select(int.Parse));
-while (lines.GetEnumerator().MoveNext()) {
-    var chart = new Chart();
-    lines
+Seq
+.Let(0, part => Seq
+.If(() => !(args.Length == 1 && int.TryParse(args[0], out part) && part is 1 or 2), () => Seq
+    .Then(() => Console.WriteLine("{0} {1}",
+        "You must specify a single argument which is either 1 or 2",
+        "for Part 1 and Part 2 respectively."
+    ))
+    .Then(() => Environment.Exit(0))
+)
+.Let(() => new List<Chart>(), charts => Seq
+.Let(GetInputLines, lines => Seq
+.Let(() => new Queue<int>(lines.First().Split(',').Select(int.Parse)), numbers => Seq
+.While(lines.GetEnumerator().MoveNext, () => Seq
+    .Let(() => new Chart(), chart => lines
         .Take(Chart.BingoSize)
         .Select(s => s.Split(' ', SplitOptions).Select(int.Parse))
         .Zip(Enumerable.Range(0, Chart.BingoSize))
         .Select(t => (t is var (xs, i))
-            .Then(
-                xs
-                    .Select((x, j) => chart.RowsAndColumns[i]
-                        .Add(x)
-                        .Then(chart.RowsAndColumns[5 + j].Add(x))
-                        .Then(chart.Sum += x)
-                    )
-                    .Force()
+            .Then(xs
+                .Select((x, j) => chart.RowsAndColumns[i].Add(x)
+                    .Then(chart.RowsAndColumns[5 + j].Add(x))
+                    .Then(chart.Sum += x)
+                ).Count()
             )
-        )
-        .Force();
-    charts.Add(chart);
-}
-var n_charts = charts.Count;
-var bingos   = 0;
-while (numbers.TryDequeue(out int n)) {
-    foreach (var chart in charts) {
-        if (chart.Bingo) continue;
-        bool marked = false;
-        foreach (var roc in chart.RowsAndColumns) {
-            if (roc.Remove(n) && !marked) {
-                marked = true;
-                chart.Sum -= n;
-            }
-        }
-        if (chart.Bingo && (part is 1 || ++bingos == n_charts)) {
-            Console.WriteLine(chart.Sum * n);
-            return;
-        }
-    }
-}
-
-IEnumerable<string> GetInputLines() {
-    string? line;
-    while ((line = Console.ReadLine()) is not null)
-        yield return line!;
-}
-
-static class Extensions {
-    public static IEnumerable<T> TakeUntil<T>(
-        this IEnumerable<T> xs, Predicate<T> p
-    ) => xs.TakeWhile(x => !p(x));
-
-    public static T Then<T>(this T obj, Action action) {
-        action();
-        return obj;
-    }
-
-    public static T Then<T>(this T obj, object x) => obj;
-    public static R Return<R>(this object obj, R x) => x;
-
-    public static IEnumerable<T> Force<T>(this IEnumerable<T> e) {
-        foreach (var _ in e);
-        return e;
-    }
-}
+        ).Count()
+        .Then(() => charts.Add(chart))
+    )
+)
+.Let(charts.Count, n_charts => Seq
+.Let(0, bingos => Seq
+.While(() => numbers.Count > 0, () => Seq
+    .Let(numbers.Dequeue, n => charts
+        .Where(chart => !chart.Bingo)
+        .Select(chart => Seq
+            .Let(false, marked => chart.RowsAndColumns
+                .Select(roc => Seq
+                    .If(() => roc.Remove(n) && !marked, () => Seq
+                        .Firstly(() => marked = true)
+                        .Then(() => chart.Sum -= n)
+                    )
+                ).Count()
+                .Then(() => Seq
+                    .If(() => chart.Bingo && (part is 1 || ++bingos == n_charts), () => Seq
+                        .Firstly(() => Console.WriteLine(chart.Sum * n))
+                        .Then(() => Environment.Exit(0))
+                    )
+                )
+            )
+        ).Count()
+    )
+)))))));
 
 class Chart {
     public const int BingoSize = 5;
@@ -95,20 +71,5 @@ class Chart {
     public Chart() {
         for (int i = 0; i < 2 * BingoSize; i++)
             RowsAndColumns[i] = new();
-    }
-
-    public override string ToString() {
-        StringBuilder b = new();
-        b.AppendLine($"Sum: {Sum}");
-        for (int rc = 0; rc <= 1; rc++) {
-            b.AppendLine(rc == 0 ? "Rows:" : "Columns:");
-            for (int i = 0; i < BingoSize; i++) {
-                b.Append("\t");
-                foreach (var x in RowsAndColumns[i + rc * BingoSize])
-                    b.Append($"{x} ");
-                b.AppendLine();
-            }
-        }
-        return b.ToString();
     }
 }
