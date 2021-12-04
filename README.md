@@ -10,4 +10,6 @@ Each day's solution is located in `src/day-NN` where `NN` is the day number.
 Since each solution may be written in a different language using different ways
 of building/running, each of these folders contains a separate README file
 explaining how to (build and) run. Any commands specified in those READMEs
-should be run from that same folder, unless otherwise specified.
+should be run from that same folder, unless otherwise specified. The commands
+should all work on bash, cmd and powershell, though on cmd you may have to
+replace forward slashes in paths with backslashes.

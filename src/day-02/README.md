@@ -29,12 +29,12 @@ To run the solution, you need to have GHC installed. Run the following commands
 to build the executable:
 
     mkdir out
-    ghc -odir out -hidir out -o out/Main Main.hs
+    ghc -odir out -hidir out -o out/Main src/Main.hs
 
 Run this command to run the solution, where `<PART>` is either `1` or `2` for
 Part 1 and Part 2 respectively:
 
-    cat input.txt | out/Main <PART>
+    cat input/input.txt | out/Main <PART>
 
 The solution is written to the standard output.
 

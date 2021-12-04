@@ -50,19 +50,19 @@ once again find the number of increases in this list, solving the problem.
 To run the solution, you need to have GNU Awk installed. Run the following
 command for the solution to Part 1:
 
-    gawk -f part-1.awk input.txt
+    gawk -f src/part-1.awk input/input.txt
 
 Run the following command for the solution to Part 2:
 
-    gawk -f part-2.awk -v w=3 input.txt | gawk -f part-1.awk
+    gawk -f src/part-2.awk -v w=3 input/input.txt | gawk -f src/part-1.awk
 
 The solution is written to the standard output.
 
 You can also use the `main.awk` script for both parts of the solution, using
 `w=1` for Part 1 and `w=3` for Part 2:
 
-    gawk -f main.awk -v w=1 input.txt
-    gawk -f main.awk -v w=3 input.txt
+    gawk -f src/main.awk -v w=1 input/input.txt
+    gawk -f src/main.awk -v w=3 input/input.txt
 
 [1]: <https://adventofcode.com/2021/day/1>
 [2]: <https://en.wikipedia.org/wiki/AWK>
