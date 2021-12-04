@@ -7,6 +7,15 @@ const StringSplitOptions SplitOptions
     = StringSplitOptions.RemoveEmptyEntries
     | StringSplitOptions.TrimEntries;
 
+int part = 0;
+if (!(args.Length == 1 && int.TryParse(args[0], out part) && part is 1 or 2)) {
+    Console.WriteLine(
+        "You must specify a single argument which is either 1 or 2 for Part 1 "
+        + "and Part 2 respectively."
+    );
+    return;
+}
+
 var charts  = new List<Chart>();
 var lines   = GetInputLines();
 var numbers = new Queue<int>(lines.First().Split(',').Select(int.Parse));
@@ -30,8 +39,11 @@ while (lines.GetEnumerator().MoveNext()) {
         .Force();
     charts.Add(chart);
 }
+var n_charts = charts.Count;
+var bingos   = 0;
 while (numbers.TryDequeue(out int n)) {
     foreach (var chart in charts) {
+        if (chart.Bingo) continue;
         bool marked = false;
         foreach (var roc in chart.RowsAndColumns) {
             if (roc.Remove(n) && !marked) {
@@ -39,7 +51,7 @@ while (numbers.TryDequeue(out int n)) {
                 chart.Sum -= n;
             }
         }
-        if (chart.Bingo) {
+        if (chart.Bingo && (part is 1 || ++bingos == n_charts)) {
             Console.WriteLine(chart.Sum * n);
             return;
         }
