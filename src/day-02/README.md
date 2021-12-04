@@ -31,15 +31,10 @@ to build the executable:
     mkdir out
     ghc -odir out -hidir out -o out/Main Main.hs
 
-Run this command to run the solution if you're using bash or cmd, where `P` is
-either `1` or `2` for Part 1 and Part 2 respectively:
+Run this command to run the solution, where `<PART>` is either `1` or `2` for
+Part 1 and Part 2 respectively:
 
-    out/Main P < input.txt
-
-If you're using Powershell, use this command to run instead, again where `P` is
-either `1` or `2` for Part 1 and Part 2 respectively:
-
-    Get-Content input.txt | out/Main P
+    cat input.txt | out/Main <PART>
 
 The solution is written to the standard output.
 
