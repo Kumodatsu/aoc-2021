@@ -29,4 +29,14 @@ Then run with the following command:
 
 The solution is written to the standard output.
 
+Since obviously the program is already incredibly fast (after all, it only
+prints a number) one could afford optimizing the binary for size. Here are some
+commands if you wish to try it out:
+
+    g++ -std=c++20 -Os -fno-exceptions -ffunction-sections -fdata-sections -o out/Main -D <PART> src/main.cpp
+    strip -s -R .comment -R .gnu.version --strip-unneeded out/Main
+
+Again `<PART>` is either `AOC_PART1` or `AOC_PART2`. If you are on windows, you
+may have to change the `out/Main` in the second command to `out/Main.exe`.
+
 [1]: <https://adventofcode.com/2021/day/5>
