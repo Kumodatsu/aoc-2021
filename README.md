@@ -1,6 +1,10 @@
 # Advent of Code 2021
 Solutions to the Advent of Code 2021 problems.
 
+Unfortunately, due to time constraints and other factors, I haven't come around
+to finishing all of the problems. I currently have no plans to finish the rest,
+though I may come back to it at some point in the future.
+
 These solutions are not meant to be the most practical, performant or readable
 solutions. My goal is to write the solutions in several different languages,
 using their features and philosophies in what I think are fun(ny) and
